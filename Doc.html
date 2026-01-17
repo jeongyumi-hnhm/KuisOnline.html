@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kuis Ilmuan Islam Terkenal</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+        }
+
+        body {
+            background-color: #f0f7f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 650px;
+        }
+
+        .card {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 3px 18px rgba(0,0,0,0.1);
+            padding: 35px;
+        }
+
+        /* Form Pendaftaran */
+        #registration-form h1 {
+            color: #0f5132;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            color: #0f5132;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #d4e9e2;
+            border-radius: 6px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #2e8b57;
+        }
+
+        /* Area Kuis */
+        #quiz-container header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #d4e9e2;
+            padding-bottom: 20px;
+        }
+
+        #quiz-container h1 {
+            color: #0f5132;
+            margin-bottom: 10px;
+        }
+
+        #user-greeting {
+            color: #2e8b57;
+            font-size: 18px;
+        }
+
+        #question-area {
+            margin-bottom: 25px;
+        }
+
+        #question-number {
+            color: #0f5132;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        #question-text {
+            color: #0a3622;
+            font-size: 20px;
+            margin-bottom: 20px;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option-item {
+            padding: 13px 18px;
+            background-color: #d4e9e2;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: #0a3622;
+        }
+
+        .option-item:hover {
+            background-color: #b7e4c7;
+        }
+
+        .option-item.selected {
+            background-color: #2e8b57;
+            color: white;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 12px 28px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: opacity 0.3s;
+            font-weight: bold;
+        }
+
+        #start-quiz-btn, #submit-btn {
+            background-color: #2e8b57;
+            color: white;
+            width: 100%;
+        }
+
+        #reset-btn {
+            background-color: #bc4749;
+            color: white;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Hasil Kuis */
+        #result-area {
+            text-align: center;
+            padding: 25px;
+            background-color: #f0f7f4;
+            border-radius: 8px;
+        }
+
+        #result-area h2 {
+            color: #0f5132;
+            margin-bottom: 20px;
+        }
+
+        #user-name-display {
+            font-size: 18px;
+            color: #0a3622;
+            margin-bottom: 10px;
+        }
+
+        #final-score {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #0f5132;
+        }
+
+        #pass-status {
+            font-size: 22px;
+            font-weight: bold;
+        }
+
+        #pass-status.lulus {
+            color: #2e8b57;
+        }
+
+        #pass-status.tidak-lulus {
+            color: #bc4749;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Form Pendaftaran -->
+        <div id="registration-form" class="card">
+            <h1>Daftar Sebelum Mengikuti Kuis</h1>
+            <div class="form-group">
+                <label for="name">Nama Lengkap:</label>
+                <input type="text" id="name" placeholder="Masukkan nama Anda">
+            </div>
+            <div class="form-group">
+                <label for="email">Email:</label>
+                <input type="email" id="email" placeholder="Masukkan email Anda">
+            </div>
+            <button id="start-quiz-btn" onclick="validateRegistration()">Mulai Kuis</button>
+        </div>
+
+        <!-- Area Kuis -->
+        <div id="quiz-container" class="card" style="display: none;">
+            <header>
+                <h1>Kuis Ilmuan Islam</h1>
+                <p id="user-greeting"></p>
+            </header>
+
+            <div id="question-area">
+                <div id="question-number"></div>
+                <div id="question-text"></div>
+                <div id="options-container" class="options"></div>
+            </div>
+
+            <div class="button-group">
+                <button id="submit-btn" onclick="checkAnswer()">Jawab</button>
+                <button id="reset-btn" onclick="resetQuiz()" style="display: none;">Ulangi Kuis</button>
+            </div>
+
+            <!-- Hasil Akhir -->
+            <div id="result-area" style="display: none;">
+                <h2>Hasil Kuis Anda</h2>
+                <p id="user-name-display"></p>
+                <p id="final-score"></p>
+                <p id="pass-status"></p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Daftar Soal Kuis tentang Ilmuan Islam
+        const quizQuestions = [
+            {
+                question: "Siapakah ilmuan Islam yang dikenal sebagai 'Bapak Obat Modern'?",
+                options: [
+                    "Ibnu Sina",
+                    "Ibnu Rushd",
+                    "Al-Khwarizmi",
+                    "Al-Biruni"
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "Ilmuan yang menemukan konsep 'aljabar' adalah?",
+                options: [
+                    "Al-Battani",
+                    "Al-Khwarizmi",
+                    "Ibn al-Haytham",
+                    "Ibnu Qayyim al-Jawziyya"
+                ],
+                correctAnswer: 1
+            },
+            {
+                question: "Siapakah ilmuan Islam yang dikenal sebagai 'Bapak Optik Modern'?",
+                options: [
+                    "Al-Biruni",
+                    "Ibnu Sina",
+                    "Ibn al-Haytham",
+                    "Al-Razi"
+                ],
+                correctAnswer: 2
+            },
+            {
+                question: "Ilmuan yang menulis buku 'Kitab al-Hawi' tentang kedokteran adalah?",
+                options: [
+                    "Al-Razi",
+                    "Ibnu Rushd",
+                    "Al-Kindi",
+                    "Ibnu Sina"
+                ],
+                correctAnswer: 0
+            },
+            {
+                question: "Siapakah ilmuan Islam yang ahli dalam astronomi dan membuat observatorium?",
+                options: [
+                    "Al-Khwarizmi",
+                    "Al-Battani",
+                    "Al-Biruni",
+                    "Ibn al-Shatir"
+                ],
+                correctAnswer: 1
+            },
+
+        ];
+
+        // Variabel Global
+        let currentQuestionIndex = 0;
+        let selectedOption = null;
+        let totalScore = 0;
+        let userName = "";
+        let userEmail = "";
+
+        // Validasi Form Pendaftaran
+        function validateRegistration() {
+            userName = document.getElementById("name").value.trim();
+            userEmail = document.getElementById("email").value.trim();
+
+            // Validasi tidak boleh kosong
+            if (userName === "") {
+                alert("Nama lengkap tidak boleh kosong!");
+                return;
+            }
+
+            // Validasi format email
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailPattern.test(userEmail)) {
+                alert("Format email tidak valid!");
+                return;
+            }
+
+            // Tampilkan area kuis dan sembunyikan form pendaftaran
+            document.getElementById("registration-form").style.display = "none";
+            document.getElementById("quiz-container").style.display = "block";
+            document.getElementById("user-greeting").textContent = `Selamat mengerjakan, ${userName}!`;
+            
+            // Inisialisasi kuis
+            initQuiz();
+        }
+
+        // Inisialisasi Kuis
+        function initQuiz() {
+            displayQuestion();
+        }
+
+        // Tampilkan Soal Saat Ini
+        function displayQuestion() {
+            const question = quizQuestions[currentQuestionIndex];
+            document.getElementById("question-number").textContent = `Soal ${currentQuestionIndex + 1}/${quizQuestions.length}`;
+            document.getElementById("question-text").textContent = question.question;
+            
+            const optionsContainer = document.getElementById("options-container");
+            optionsContainer.innerHTML = "";
+            
+            question.options.forEach((option, index) => {
+                const optionElement = document.createElement("div");
+                optionElement.className = "option-item";
+                optionElement.textContent = option;
+                optionElement.onclick = () => selectOption(index, optionElement);
+                optionsContainer.appendChild(optionElement);
+            });
+            
+            selectedOption = null;
+        }
+
+        // Pilih Opsi Jawaban
+        function selectOption(index, element) {
+            const allOptions = document.querySelectorAll(".option-item");
+            allOptions.forEach(opt => opt.classList.remove("selected"));
+            element.classList.add("selected");
+            selectedOption = index;
+        }
+
+        // Periksa Jawaban
+        function checkAnswer() {
+            if (selectedOption === null) {
+                alert("Silakan pilih salah satu jawaban terlebih dahulu!");
+                return;
+            }
+
+            // Hitung skor jika benar
+            if (selectedOption === quizQuestions[currentQuestionIndex].correctAnswer) {
+                totalScore += 20;
+            }
+
+            // Lanjutkan atau tampilkan hasil
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizQuestions.length) {
+                displayQuestion();
+            } else {
+                showResult();
+            }
+        }
+
+        // Tampilkan Hasil Akhir
+        function showResult() {
+            document.getElementById("question-area").style.display = "none";
+            document.getElementById("submit-btn").style.display = "none";
+            document.getElementById("reset-btn").style.display = "inline-block";
+            document.getElementById("result-area").style.display = "block";
+
+            document.getElementById("user-name-display").textContent = `Nama Peserta: ${userName}`;
+            document.getElementById("final-score").textContent = `Skor Akhir: ${totalScore}/${quizQuestions.length * 20}`;
+            const statusElement = document.getElementById("pass-status");
+
+            if (totalScore >= 70) {
+                statusElement.textContent = "Selamat, Anda Lulus!";
+                statusElement.className = "lulus";
+            } else {
+                statusElement.textContent = "Maaf, Anda Tidak Lulus.";
+                statusElement.className = "tidak-lulus";
+            }
+        }
+
+        // Reset Kuis
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            totalScore = 0;
+            document.getElementById("question-area").style.display = "block";
+            document.getElementById("submit-btn").style.display = "inline-block";
+            document.getElementById("reset-btn").style.display = "none";
+            document.getElementById("result-area").style.display = "none";
+            initQuiz();
+        }
+    </script>
+</body>
+</html>
